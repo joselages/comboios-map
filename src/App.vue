@@ -1,21 +1,39 @@
 <template>
   <div id="app">
+    <form>
+      <label for="start">Start</label>
+      <input v-model="startTime" type="time" />
+      <label for="end">End</label>
+      <input v-model="endTime" type="time" />
+      <button @click.prevent="getDuration">Go!</button>
+    </form>
+    <!--     <p v-if="endTime">
+      O comboio partiu às {{ startTime }} e chega por volta das {{ endTime }}
+    </p> -->
     <div class="container">
       <span id="start" class="start"></span>
       <span id="end" class="end"></span>
       <img src="./assets/mapa.png" />
       <img class="train" src="./assets/train.svg" />
     </div>
-    <button @click.prevent="getJourney" class="js-btn">OLA</button>
+    <!--     <button @click.prevent="getJourney" class="js-btn">OLA</button>
+    -->
   </div>
 </template>
 
 <script>
 import LeaderLine from "leader-line-vue";
-const comboios = require("comboios");
+var moment = require("moment"); // require
 
 export default {
   name: "App",
+  data: function() {
+    return {
+      startTime: "",
+      endTime: "",
+      tripDuration: null,
+    };
+  },
   mounted() {
     LeaderLine.setLine(
       document.getElementById("start"),
@@ -34,15 +52,18 @@ export default {
     );
   },
   methods: {
-    getJourney: function () {
-      const porto = "94-2006";
-      const lisboa = {
-        type: "station",
-        id: "94-30007",
-        name: "Lisboa - Santa Apolonia",
-      };
+    getDuration: function() {
+      var start = moment(this.startTime, "hh:mm");
+      var end = moment(this.endTime, "hh:mm");
 
-      comboios.journeys(porto, lisboa).then(console.log).catch(console.error);
+      var result = end.diff(start, "hours", true);
+
+      this.calculation(start, end, result);
+    },
+    calculation: function(start, end, duration) {
+      var now = moment().format("HH:mm");
+      console.log(duration);
+      console.log(now);
     },
   },
 };
@@ -93,7 +114,7 @@ img {
   /* transform: rotate(-180deg); */
   offset-rotate: reverse;
   offset-path: path("M 200 75 L 75 700");
-  offset-distance: 00%;
+  offset-distance: 0%;
 }
 
 .js-btn {
